@@ -1,0 +1,68 @@
+mql5
+// Forex Gump Gold
+// Developer's site: forexroboteasy.com
+// Developed by: Forex Robot Easy Team
+
+// Include necessary libraries
+#include <Trade\Trade.mqh>
+#include <MovingAverages.mqh>
+
+// Define constants
+const double stopLossMultiplier = 1.5; // Stop loss multiplier
+const double profitFactorTarget = 4; // Profit factor target
+
+// Initialize trading robot
+CTrade trade;
+
+// OnInit function
+void OnInit()
+{
+   // Set initial parameters
+   trade.SetExpertMagicNumber(123456); // Magic number for identification
+   trade.SetDeviationInPoints(10); // Maximum allowed deviation in points
+
+   // Print initialization message
+   Print('Forex Gump Gold initialized!');
+}
+
+// OnTick function
+void OnTick()
+{
+   // Get current market price
+   double price = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+
+   // Check if there are any open positions
+   if(trade.PositionsTotal() == 0)
+   {
+      // Calculate stop loss level based on multiplier
+      double stopLoss = stopLossMultiplier * SymbolInfoDouble(_Symbol, SYMBOL_POINT);
+
+      // Open a new position
+      trade.PositionOpen(_Symbol, TRADE_ACTION_DEAL, TRADE_VOLUME_MAX, price, 0, stopLoss, 0, 'Forex Gump Gold');
+
+      // Print position opening message
+      Print('New position opened: ', _Symbol, ' at price: ', price, ' with stop loss: ', stopLoss);
+   }
+   else
+   {
+      // Calculate profit factor
+      double profitFactor = trade.Profit() / trade.Loss();
+
+      // Check if profit factor meets target
+      if(profitFactor >= profitFactorTarget)
+      {
+         // Close all positions
+         trade.PositionCloseAll();
+
+         // Print closing message
+         Print('All positions closed due to reaching target profit factor: ', profitFactor);
+      }
+   }
+}
+
+// OnDeinit function
+void OnDeinit(const int reason)
+{
+   // Print deinitialization message
+   Print('Forex Gump Gold deinitialized!');
+}
